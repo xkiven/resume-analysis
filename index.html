@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 智能简历分析系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI 智能简历分析系统</h1>
+            <p class="subtitle">基于通义千问 AI 的智能简历解析与匹配</p>
+        </header>
+
+        <main>
+            <section class="upload-section">
+                <h2>上传简历</h2>
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="resumeFile" accept=".pdf" hidden>
+                    <div class="upload-content">
+                        <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p>点击或拖拽上传 PDF 简历</p>
+                        <span class="file-hint">支持 PDF 格式，最大 10MB</span>
+                    </div>
+                </div>
+                <button class="btn-primary" id="uploadBtn" disabled>上传简历</button>
+            </section>
+
+            <section class="result-section" id="resultSection" style="display: none;">
+                <h2>解析结果</h2>
+                <div class="info-card">
+                    <div class="info-item">
+                        <label>姓名</label>
+                        <span id="name">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>电话</label>
+                        <span id="phone">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>邮箱</label>
+                        <span id="email">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>地址</label>
+                        <span id="address">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>求职意向</label>
+                        <span id="jobIntent">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>工作年限</label>
+                        <span id="workYears">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>学历</label>
+                        <span id="education">-</span>
+                    </div>
+                    <div class="info-item full-width">
+                        <label>技能</label>
+                        <div class="skills-list" id="skills">-</div>
+                    </div>
+                    <div class="info-item full-width">
+                        <label>工作经历</label>
+                        <p id="experience">-</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="match-section" id="matchSection" style="display: none;">
+                <h2>岗位匹配</h2>
+                <div class="match-form">
+                    <label for="jobDesc">请输入岗位描述</label>
+                    <textarea id="jobDesc" placeholder="例如：招聘Python开发工程师，要求熟练掌握Python、Django、MySQL..."></textarea>
+                    <button class="btn-primary" id="matchBtn">开始匹配</button>
+                </div>
+
+                <div class="match-result" id="matchResult" style="display: none;">
+                    <div class="score-card">
+                        <div class="score-circle">
+                            <span id="matchScore">0</span>
+                            <small>分</small>
+                        </div>
+                        <div class="score-label">匹配度</div>
+                    </div>
+                    <div class="match-details">
+                        <div class="detail-item">
+                            <label>技能匹配率</label>
+                            <div class="progress-bar">
+                                <div class="progress" id="skillProgress" style="width: 0%"></div>
+                            </div>
+                            <span id="skillRate">0%</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>经验相关性</label>
+                            <div class="progress-bar">
+                                <div class="progress" id="expProgress" style="width: 0%"></div>
+                            </div>
+                            <span id="expRate">0%</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>匹配的技能</label>
+                            <div class="skills-list matched" id="matchedSkills"></div>
+                        </div>
+                        <div class="detail-item">
+                            <label>缺失的技能</label>
+                            <div class="skills-list missing" id="missingSkills"></div>
+                        </div>
+                        <div class="detail-item full-width">
+                            <label>分析说明</label>
+                            <p id="analysis">-</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="loading" id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>AI 正在分析中...</p>
+            </div>
+        </main>
+
+        <footer>
+            <p>Powered by 阿里云 Serverless + 通义千问</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
