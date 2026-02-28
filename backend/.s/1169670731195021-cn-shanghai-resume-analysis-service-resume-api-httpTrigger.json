@@ -18,7 +18,7 @@
       "disableURLInternet": false
     },
     "createdTime": "2026-02-28T11:56:18Z",
-    "lastModifiedTime": "2026-02-28T12:18:31Z",
+    "lastModifiedTime": "2026-02-28T12:21:12Z",
     "status": null,
     "targetArn": null,
     "name": "httpTrigger"

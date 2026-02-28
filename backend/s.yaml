@@ -15,7 +15,7 @@ services:
         runtime: python3.10
         memorySize: 1024
         timeout: 120
-        handler: src.main.handler
+        handler: src.main_simple.handler
         codeUri: ./
       triggers:
         - name: httpTrigger
