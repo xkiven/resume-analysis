@@ -16,6 +16,7 @@ services:
         memorySize: 512
         timeout: 60
         handler: src.main.handler
+        codeUri: ./
       triggers:
         - name: httpTrigger
           type: http
