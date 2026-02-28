@@ -1,6 +1,7 @@
 edition: 1.0.0
 services:
   resume-analysis-service:
+    component: fc
     provider:
       name: aliyun
       runtime: python3.10
