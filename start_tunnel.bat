@@ -1,0 +1,3 @@
+@echo off
+echo Starting localtunnel...
+npx localtunnel -p 5000
