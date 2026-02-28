@@ -1,0 +1,26 @@
+{
+  "statefulConfig": {
+    "triggerName": "httpTrigger",
+    "description": "",
+    "triggerId": "68bc8e67-4b1f-4900-bb63-a3dbea1e542d",
+    "sourceArn": null,
+    "triggerType": "http",
+    "invocationRole": null,
+    "qualifier": "LATEST",
+    "urlInternet": "https://resume-api-resume-service-lxvnobexrq.cn-shanghai.fcapp.run",
+    "urlIntranet": "https://resume-api-resume-service-lxvnobexrq.cn-shanghai-vpc.fcapp.run",
+    "triggerConfig": {
+      "methods": [
+        "POST",
+        "GET"
+      ],
+      "authType": "anonymous",
+      "disableURLInternet": false
+    },
+    "createdTime": "2026-02-28T11:56:18Z",
+    "lastModifiedTime": "2026-02-28T12:00:13Z",
+    "status": null,
+    "targetArn": null,
+    "name": "httpTrigger"
+  }
+}

@@ -17,9 +17,6 @@ services:
         timeout: 120
         handler: src.main.handler
         codeUri: ./
-        environmentVariables:
-          - key: DASHSCOPE_API_KEY
-            value: sk-c3c62b663de04038b76d2f444efbc979
       triggers:
         - name: httpTrigger
           type: http

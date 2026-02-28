@@ -4,6 +4,11 @@ import json
 import uuid
 import base64
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+deps_dir = os.path.join(current_dir, 'dependencies')
+if os.path.exists(deps_dir):
+    sys.path.insert(0, deps_dir)
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from flask import Flask, request, jsonify

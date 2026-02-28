@@ -1,0 +1,6 @@
+{
+  "serviceName": "resume-analysis-service",
+  "functionNames": [
+    "resume-analysis-service/resume-api"
+  ]
+}

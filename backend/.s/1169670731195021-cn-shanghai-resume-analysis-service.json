@@ -1,0 +1,43 @@
+{
+  "statefulConfig": {
+    "serviceName": "resume-analysis-service",
+    "description": "Resume Analysis Service",
+    "role": "",
+    "logConfig": {
+      "project": "",
+      "logstore": "",
+      "enableRequestMetrics": false,
+      "enableInstanceMetrics": false,
+      "logBeginRule": "None",
+      "enableCustomExtraLog": true,
+      "enableLlmMetrics": null
+    },
+    "serviceId": "68b3c030-c78f-44fa-952b-da97efbc8aa8",
+    "createdTime": "2026-02-28T11:55:11Z",
+    "lastModifiedTime": "2026-02-28T12:00:13Z",
+    "vpcConfig": {
+      "vpcId": "",
+      "vSwitchIds": [],
+      "securityGroupId": "",
+      "role": null,
+      "anytunnelViaENI": null
+    },
+    "internetAccess": true,
+    "nasConfig": {
+      "userId": -1,
+      "groupId": -1,
+      "mountPoints": []
+    },
+    "ossMountConfig": {
+      "mountPoints": []
+    },
+    "vendorConfig": null,
+    "tracingConfig": {
+      "type": null,
+      "params": null,
+      "jaegerConfig": null
+    },
+    "useSLRAuthentication": false,
+    "name": "resume-analysis-service"
+  }
+}

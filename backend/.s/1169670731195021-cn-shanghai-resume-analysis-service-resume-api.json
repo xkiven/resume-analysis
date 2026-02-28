@@ -1,0 +1,44 @@
+{
+  "statefulConfig": {
+    "functionId": "e0989b06-af7b-4c68-b0a5-5a1e68f4d474",
+    "functionName": "resume-api",
+    "description": "This is default function description by fc-deploy component",
+    "runtime": "python3.10",
+    "handler": "src.main.handler",
+    "timeout": 120,
+    "initializer": "",
+    "initializationTimeout": 3,
+    "codeSize": 328001,
+    "codeChecksum": "6125121014113167239",
+    "memorySize": 512,
+    "gpuMemorySize": null,
+    "environmentVariables": {},
+    "createdTime": "2026-02-28T11:56:18Z",
+    "lastModifiedTime": "2026-02-28T12:00:13Z",
+    "instanceConcurrency": 1,
+    "instanceSoftConcurrency": null,
+    "customContainerConfig": null,
+    "caPort": null,
+    "instanceType": "e1",
+    "layers": null,
+    "layersArnV2": null,
+    "instanceLifecycleConfig": {
+      "preFreeze": {
+        "handler": "",
+        "timeout": 3,
+        "command": null
+      },
+      "preStop": {
+        "handler": "",
+        "timeout": 3,
+        "command": null
+      }
+    },
+    "customDNS": null,
+    "customRuntimeConfig": null,
+    "customHealthCheckConfig": null,
+    "sessionAffinity": null,
+    "initializerCommand": null,
+    "name": "resume-api"
+  }
+}
