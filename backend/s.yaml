@@ -14,21 +14,12 @@ services:
         name: resume-api
         runtime: python3.10
         memorySize: 512
-        timeout: 60
+        timeout: 120
         handler: src.main.handler
         codeUri: ./
         environmentVariables:
-          DASHSCOPE_API_KEY: sk-c3c62b663de04038b76d2f444efbc979
-        pip:
-          - flask
-          - flask-cors
-          - werkzeug
-          - dashscope
-          - pdfplumber
-          - redis
-          - PyJWT
-          - python-multipart
-          - python-dotenv
+          - key: DASHSCOPE_API_KEY
+            value: sk-c3c62b663de04038b76d2f444efbc979
       triggers:
         - name: httpTrigger
           type: http
