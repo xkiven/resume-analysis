@@ -10,15 +10,8 @@ redis_port = int(os.environ.get('REDIS_PORT', 6379))
 redis_password = os.environ.get('REDIS_PASSWORD', None)
 
 try:
-    redis_client = redis.Redis(
-        host=redis_host,
-        port=redis_port,
-        password=redis_password,
-        decode_responses=True,
-        socket_connect_timeout=5
-    )
     redis_client.ping()
-    REDIS_AVAILABLE = True
+    REDIS_AVAILABLE = False # 强制禁用Redis
 except Exception:
     redis_client = None
     REDIS_AVAILABLE = False

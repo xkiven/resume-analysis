@@ -19,8 +19,6 @@ services:
         instanceType: e1
         environmentVariables:
           DASHSCOPE_API_KEY: sk-c3c62b663de04038b76d2f444efbc979
-          REDIS_HOST: r-bp14l3a42sfads672j.redis.rds.aliyuncs.com
-          REDIS_PORT: 6379
       triggers:
         - name: httpTrigger
           type: http
