@@ -1,6 +1,7 @@
 import os
 import json
 import dashscope
+from dashscope import Generation
 from typing import Dict, Optional
 
 dashscope.api_key = os.environ.get('DASHSCOPE_API_KEY', '')
@@ -9,60 +10,52 @@ dashscope.api_key = os.environ.get('DASHSCOPE_API_KEY', '')
 def extract_info_with_ai(text: str) -> Dict:
     """使用通义千问AI模型从简历文本中提取关键信息"""
     
-    prompt = f"""你是一个专业的简历信息提取助手。请从以下简历文本中提取关键信息，并以JSON格式返回。
+    prompt = f"""你是一个简历信息提取助手。从以下简历中提取所有信息。
 
-必须提取的信息：
-- name: 姓名
-- phone: 电话号码
-- email: 电子邮箱
-- address: 地址
+【关键】只提取简历中实际存在的内容，不要猜测。
 
-可选提取的信息：
-- job_intent: 求职意向
-- work_years: 工作年限
-- education: 学历背景
-- skills: 技能列表（数组形式）
-- experience: 工作经历摘要
-
-请严格按照以下JSON格式返回，不要添加任何解释性文字：
+返回格式（只返回JSON，包含所有字段）：
 {{
     "name": "姓名",
-    "phone": "电话号码",
-    "email": "电子邮箱",
+    "phone": "电话",
+    "email": "邮箱",
     "address": "地址",
     "job_intent": "求职意向",
     "work_years": "工作年限",
     "education": "学历背景",
-    "skills": ["技能1", "技能2"],
-    "experience": "工作经历摘要"
+    "skills": ["Go", "Python", "MySQL"],
+    "experience": "项目经历描述，包含项目名称、职责、技术栈等"
 }}
 
 简历文本：
-{text[:3000]}"""
+{text[:3500]}"""
 
     try:
-        response = dashscope.Generation.call(
-            model=dashscope.Generation.Models.QWEN_TURBO,
+        response = Generation.call(
+            model=Generation.Models.qwen_turbo,
             prompt=prompt,
-            format='message',
-            messages=[{
-                'role': 'user',
-                'content': prompt
-            }],
             temperature=0.1
         )
         
         if response.status_code == 200:
-            content = response.output.choices[0].message.content
+            content = response.output.text
             json_str = extract_json_from_response(content)
             if json_str:
-                return json.loads(json_str)
+                result = json.loads(json_str)
+                if "experience" not in result or not result.get("experience"):
+                    if "experiences" in result:
+                        result["experience"] = "\n".join([
+                            f"{exp.get('title', '')} - {exp.get('role', '')}: {exp.get('description', '')}" 
+                            for exp in result.get("experiences", [])
+                        ])
+                return result
             else:
                 return create_default_info()
         else:
             return create_default_info()
             
     except Exception as e:
+        print(f"AI提取错误: {e}")
         return create_default_info()
 
 

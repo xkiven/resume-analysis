@@ -1,6 +1,7 @@
 import os
 import json
 import dashscope
+from dashscope import Generation
 from typing import Dict, List
 
 dashscope.api_key = os.environ.get('DASHSCOPE_API_KEY', '')
@@ -14,49 +15,59 @@ def match_with_ai(resume_info: Dict, job_description: str) -> Dict:
     education = resume_info.get("education", "")
     work_years = resume_info.get("work_years", "")
     
-    prompt = f"""你是一个专业的招聘顾问。请分析以下简历与岗位要求的匹配程度。
+    job_keywords = []
+    import re
+    tech_pattern = r'[A-Za-z+#]+'
+    job_keywords = re.findall(tech_pattern, job_description)
+    job_keywords = [k for k in job_keywords if len(k) > 1]
+    
+    matched = []
+    missing = []
+    for kw in job_keywords:
+        kw_lower = kw.lower()
+        found = any(kw_lower in s.lower() or kw in s for s in skills)
+        if found:
+            matched.append(kw)
+        else:
+            missing.append(kw)
+    
+    skill_rate = len(matched) / len(job_keywords) if job_keywords else 0
+    
+    prompt = f"""你是一个招聘顾问。分析以下简历与岗位的匹配度。
 
-简历信息：
-- 技能: {', '.join(skills) if skills else '未提供'}
-- 工作经历: {experience[:500] if experience else '未提供'}
-- 学历: {education}
-- 工作年限: {work_years}
+简历技能: {json.dumps(skills, ensure_ascii=False)}
+项目经历: {experience[:300] if experience else '无'}
+岗位要求: {job_description[:300]}
 
-岗位要求：
-{job_description[:1000]}
+已匹配的技能: {matched}
+缺失的技能: {missing}
 
-请以JSON格式返回匹配分析结果：
+请根据以上信息给出评分。只返回JSON：
 {{
-    "match_score": 85,
-    "skill_match_rate": 0.8,
-    "experience_relevance": 0.9,
-    "matched_skills": ["技能1", "技能2"],
-    "missing_skills": ["缺失技能1"],
-    "analysis": "简要分析说明"
-}}
-
-只返回JSON，不要其他文字。"""
+    "match_score": 0-100,
+    "skill_match_rate": 0.0-1.0,
+    "experience_relevance": 0.0-1.0,
+    "matched_skills": {json.dumps(matched)},
+    "missing_skills": {json.dumps(missing)},
+    "analysis": "简短分析"
+}}"""
 
     try:
-        response = dashscope.Generation.call(
-            model=dashscope.Generation.Models.QWEN_TURBO,
+        response = Generation.call(
+            model=Generation.Models.qwen_turbo,
             prompt=prompt,
-            format='message',
-            messages=[{
-                'role': 'user',
-                'content': prompt
-            }],
             temperature=0.2
         )
         
         if response.status_code == 200:
-            content = response.output.choices[0].message.content
+            content = response.output.text
             result = parse_match_result(content)
             return result
         else:
             return create_default_match()
             
     except Exception as e:
+        print(f"AI匹配错误: {e}")
         return create_default_match()
 
 
