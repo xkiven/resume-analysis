@@ -6,12 +6,6 @@ import base64
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-try:
-    from dotenv import load_dotenv
-    load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
-except ImportError:
-    pass
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
@@ -20,6 +14,11 @@ import io
 app = Flask(__name__)
 CORS(app)
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
+
+DASHSCOPE_API_KEY = os.environ.get('DASHSCOPE_API_KEY', '')
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', '')
 
 from src.parser import extract_text_from_pdf, clean_text, split_sections
 from src.extractor import extract_info_with_ai, extract_info_fallback
