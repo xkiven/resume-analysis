@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://clear-kids-fail.loca.lt/api';
+const API_BASE_URL = 'https://tender-aliens-grin.loca.lt/api';
 
 let resumeId = null;
 let selectedFile = null;
