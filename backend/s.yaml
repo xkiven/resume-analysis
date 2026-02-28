@@ -19,6 +19,16 @@ services:
         codeUri: ./
         environmentVariables:
           DASHSCOPE_API_KEY: sk-c3c62b663de04038b76d2f444efbc979
+        pip:
+          - flask
+          - flask-cors
+          - werkzeug
+          - dashscope
+          - pdfplumber
+          - redis
+          - PyJWT
+          - python-multipart
+          - python-dotenv
       triggers:
         - name: httpTrigger
           type: http
