@@ -1,27 +1,32 @@
 # 阿里云函数计算部署指南
 
-## 前置条件
-1. 阿里云账号
-2. 已开通函数计算服务
+## 步骤1：配置凭证
 
-## 步骤1：配置阿里云CLI
+运行以下命令（替换为您的实际值）：
 
 ```bash
-npm install -g @serverless-devs/s
+s config add -a aliyun --AccessKeyID 您的AccessKeyID --AccessKeySecret 您的AccessKeySecret
 ```
 
-配置凭证（替换为您的实际值）：
+或使用环境变量：
 ```bash
-s config add \
-  --AccessKeyID 您的AccessKeyID \
-  --AccessKeySecret 您的AccessKeySecret \
-  --AccountID 您的阿里云账户ID
+set ALIYUN_ACCESS_KEY_ID=您的AccessKeyID
+set ALIYUN_ACCESS_KEY_SECRET=您的AccessKeySecret
 ```
 
 ## 步骤2：修改配置
 
-编辑 `backend/serverless.yml`，将 `${env:xxx}` 替换为实际值：
-- ALIYUN_ACCOUNT_ID: 您的阿里云账户ID
+编辑 `backend/serverless.yml`，移除或简化 vpcConfig（新手建议先不加VPC）：
+
+```yaml
+provider:
+  name: aliyun
+  runtime: python3.10
+  memorySize: 512
+  timeout: 60
+  region: cn-shanghai
+  # 移除 vpcConfig 相关配置
+```
 
 ## 步骤3：部署
 
@@ -32,13 +37,9 @@ s deploy
 
 ## 步骤4：配置环境变量
 
-在阿里云控制台为函数配置环境变量：
+在阿里云控制台为函数添加环境变量：
 - DASHSCOPE_API_KEY: 您的通义千问API Key
 
-## 步骤5：获取API地址
+## 步骤5：更新前端
 
-部署成功后，会显示HTTP触发器地址
-
-## 步骤6：更新前端
-
-将获取的API地址更新到 `app.js` 中的 `API_BASE_URL`
+部署完成后，将 API 地址更新到 `app.js`

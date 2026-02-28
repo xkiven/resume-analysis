@@ -6,53 +6,36 @@ provider:
   memorySize: 512
   timeout: 60
   region: cn-shanghai
-  role: acs:ram::${env:ALIYUN_ACCOUNT_ID}:role/fc-default-role
-  vpcConfig:
-    vpcId: ${env:VPC_ID}
-    vswitchIds:
-      - ${env:VSWITCH_ID}
-    securityGroupId: ${env:SECURITY_GROUP_ID}
 
 functions:
   resumeUpload:
     handler: src.main.resume_upload
-    description: 简历上传与解析接口
+    description: Resume upload API
     events:
       - http:
-          name: resumeUpload
           path: /api/resume/upload
           method: POST
-          cors: true
 
   resumeExtract:
     handler: src.main.resume_extract
-    description: 简历信息提取接口
+    description: Resume extract API
     events:
       - http:
-          name: resumeExtract
           path: /api/resume/extract
           method: POST
-          cors: true
 
   resumeMatch:
     handler: src.main.resume_match
-    description: 简历岗位匹配接口
+    description: Resume match API
     events:
       - http:
-          name: resumeMatch
           path: /api/resume/match
           method: POST
-          cors: true
 
   healthCheck:
     handler: src.main.health_check
-    description: 健康检查接口
+    description: Health check API
     events:
       - http:
-          name: healthCheck
           path: /api/health
           method: GET
-          cors: true
-
-plugins:
-  - serverless-oss-local
