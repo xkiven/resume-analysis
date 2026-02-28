@@ -9,14 +9,14 @@ services:
       region: cn-shanghai
       service:
         name: resume-analysis-service
-        description: Resume Analysis Service
       function:
         name: resume-api
         runtime: python3.10
         memorySize: 1024
         timeout: 120
-        handler: src.main_simple.handler
+        handler: src.main_pure.handler
         codeUri: ./
+        instanceType: e1
       triggers:
         - name: httpTrigger
           type: http
@@ -25,3 +25,10 @@ services:
             methods:
               - POST
               - GET
+      customDomains:
+        - domainName: resume-api.resume-analysis.cn-shanghai.fcapp.run
+          protocol: HTTP
+          routeConfigs:
+            - path: /
+              serviceName: resume-analysis-service
+              functionName: resume-api
