@@ -25,10 +25,3 @@ services:
             methods:
               - POST
               - GET
-      customDomains:
-        - domainName: resume-api.resume-analysis.cn-shanghai.fcapp.run
-          protocol: HTTP
-          routeConfigs:
-            - path: /
-              serviceName: resume-analysis-service
-              functionName: resume-api
