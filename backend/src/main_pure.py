@@ -8,11 +8,43 @@ from urllib import request, parse
 from urllib.request import urlopen, Request
 from urllib.error import URLError
 
-from src.cache import cache_resume_text, get_cached_resume_text, cache_resume_info, get_cached_resume_info, cache_match_result, get_cached_match_result
+# from src.cache import cache_resume_text, get_cached_resume_text, cache_resume_info, get_cached_resume_info, cache_match_result, get_cached_match_result
 from src.extractor_simple import extract_info_with_ai
 from src.matcher_simple import match_with_ai
 
 DASHSCOPE_API_KEY = os.environ.get('DASHSCOPE_API_KEY', '')
+
+_local_session_storage = {} # 使用内存字典模拟会话存储
+
+
+def _cache_data(key_prefix: str, resume_id: str, data: dict or str) -> bool:
+    _local_session_storage[f"{key_prefix}:{resume_id}"] = data
+    return True
+
+def _get_cached_data(key_prefix: str, resume_id: str) -> dict or str or None:
+    return _local_session_storage.get(f"{key_prefix}:{resume_id}")
+
+# 替换缓存函数
+def cache_resume_text(resume_id: str, text: str) -> bool:
+    return _cache_data("resume:text", resume_id, text)
+
+def get_cached_resume_text(resume_id: str) -> str or None:
+    return _get_cached_data("resume:text", resume_id)
+
+def cache_resume_info(resume_id: str, info: dict) -> bool:
+    return _cache_data("resume:info", resume_id, info)
+
+def get_cached_resume_info(resume_id: str) -> dict or None:
+    return _get_cached_data("resume:info", resume_id)
+
+def cache_match_result(resume_id: str, job_desc: str, result: dict) -> bool:
+    # 模拟md5，简单存储
+    cache_key = f"{resume_id}:{job_desc}"
+    return _cache_data("match:result", cache_key, result)
+
+def get_cached_match_result(resume_id: str, job_desc: str) -> dict or None:
+    cache_key = f"{resume_id}:{job_desc}"
+    return _get_cached_data("match:result", cache_key)
 
 
 def call_qwen(prompt: str) -> str:
@@ -92,7 +124,7 @@ def handler(environ, start_response):
                         extracted_text = "PDF解析功能不可用，请配置本地环境或Layer"
                         
                         resume_id = str(uuid.uuid4())
-                        cache_resume_text(resume_id, extracted_text) # 使用缓存
+                        cache_resume_text(resume_id, extracted_text) # 使用模拟缓存
                         
                         response = json.dumps({
                             "success": True,
@@ -136,7 +168,7 @@ def handler(environ, start_response):
             
             info = extract_info_with_ai_wrapper(cached_text)
             info["resume_id"] = resume_id
-            cache_resume_info(resume_id, info) # 使用缓存
+            cache_resume_info(resume_id, info) # 使用模拟缓存
             
             response = json.dumps({"success": True, "data": info, "cached": False})
             start_response('200 OK', [('Content-Type', 'application/json')])
@@ -173,7 +205,7 @@ def handler(environ, start_response):
             
             result = match_with_ai_wrapper(cached_info, job_description)
             result["resume_id"] = resume_id
-            cache_match_result(resume_id, job_description, result) # 使用缓存
+            cache_match_result(resume_id, job_description, result) # 使用模拟缓存
             
             response = json.dumps({"success": True, "data": result, "cached": False})
             start_response('200 OK', [('Content-Type', 'application/json')])
