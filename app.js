@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://resume-api-resume-service-lxvnobexrq.cn-shanghai.fcapp.run/api';
+const API_BASE_URL = 'https://acuate-overdeep-ignacio.ngrok-free.dev/api';
 
 let resumeId = null;
 let selectedFile = null;
