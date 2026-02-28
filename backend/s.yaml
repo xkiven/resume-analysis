@@ -9,7 +9,6 @@ services:
       region: cn-shanghai
       service:
         name: resume-analysis-service
-        description: Resume Analysis Service
       function:
         name: resume-api
         runtime: python3.10
@@ -18,7 +17,10 @@ services:
         handler: src.main_pure.handler
         codeUri: ./
         instanceType: e1
-        # 移除 customRuntimeConfiguration 和 layers 配置
+        environmentVariables:
+          DASHSCOPE_API_KEY: sk-c3c62b663de04038b76d2f444efbc979
+          REDIS_HOST: r-bp14l3a42sfads672j.redis.rds.aliyuncs.com
+          REDIS_PORT: 6379
       triggers:
         - name: httpTrigger
           type: http
