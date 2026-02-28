@@ -1,39 +1,26 @@
-edition: 1.0.0
+edition: 2.0.0
+name: resume-analysis
+access: default
+
 services:
-  resume-analysis-service:
-    component: fc
-    provider:
-      name: aliyun
-      runtime: python3.10
-      memorySize: 512
-      timeout: 60
+  resume-analysis:
+    component: devsapp/fc
+    props:
       region: cn-shanghai
-    functions:
-      resumeUpload:
-        handler: src.main.resume_upload
-        description: Resume upload API
-        events:
-          - http:
-              path: /api/resume/upload
-              method: POST
-      resumeExtract:
-        handler: src.main.resume_extract
-        description: Resume extract API
-        events:
-          - http:
-              path: /api/resume/extract
-              method: POST
-      resumeMatch:
-        handler: src.main.resume_match
-        description: Resume match API
-        events:
-          - http:
-              path: /api/resume/match
-              method: POST
-      healthCheck:
-        handler: src.main.health_check
-        description: Health check API
-        events:
-          - http:
-              path: /api/health
-              method: GET
+      service:
+        name: resume-analysis-service
+        description: Resume Analysis Service
+      function:
+        name: resume-api
+        runtime: python3.10
+        memorySize: 512
+        timeout: 60
+        handler: src.main.handler
+      triggers:
+        - name: httpTrigger
+          type: http
+          config:
+            authType: anonymous
+            methods:
+              - POST
+              - GET
