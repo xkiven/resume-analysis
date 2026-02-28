@@ -8,12 +8,6 @@ from urllib import request, parse
 from urllib.request import urlopen, Request
 from urllib.error import URLError
 
-try:
-    import pdfplumber
-    PDFPLUMBER_AVAILABLE = True
-except ImportError:
-    PDFPLUMBER_AVAILABLE = False
-
 DASHSCOPE_API_KEY = os.environ.get('DASHSCOPE_API_KEY', '')
 
 resume_storage = {}
@@ -126,19 +120,7 @@ def handler(environ, start_response):
                     if b'filename=' in part and b'.pdf' in part:
                         file_content = part.split(b'\r\n\r\n')[-1].split(b'\r\n--')[0]
                         
-                        extracted_text = ""
-                        if PDFPLUMBER_AVAILABLE:
-                            try:
-                                pdf_file = io.BytesIO(file_content)
-                                with pdfplumber.open(pdf_file) as pdf:
-                                    for page in pdf.pages:
-                                        page_text = page.extract_text()
-                                        if page_text:
-                                            extracted_text += page_text + "\n"
-                            except Exception as e:
-                                extracted_text = f"PDF解析错误: {str(e)}"
-                        else:
-                            extracted_text = "PDF解析功能不可用，请配置Layer"
+                        extracted_text = "PDF解析功能不可用，请配置本地环境或Layer"
                         
                         resume_id = str(uuid.uuid4())
                         resume_storage[resume_id] = {"text": extracted_text, "file_content": base64.b64encode(file_content).decode()}
@@ -147,7 +129,7 @@ def handler(environ, start_response):
                             "success": True,
                             "data": {
                                 "resume_id": resume_id,
-                                "text": extracted_text[:500] if extracted_text else "PDF解析失败",
+                                "text": extracted_text,
                                 "text_length": len(extracted_text),
                                 "status": "success"
                             }

@@ -9,6 +9,7 @@ services:
       region: cn-shanghai
       service:
         name: resume-analysis-service
+        description: Resume Analysis Service
       function:
         name: resume-api
         runtime: python3.10
@@ -17,11 +18,7 @@ services:
         handler: src.main_pure.handler
         codeUri: ./
         instanceType: e1
-        customRuntimeConfiguration:
-          initializationTimeout: 20
-          entry: ""
-      layers:
-        - acs:fc:cn-shanghai:9fe463ad9679eb42b386dd003a9977ef:resume-deps:1
+        # 移除 customRuntimeConfiguration 和 layers 配置
       triggers:
         - name: httpTrigger
           type: http
@@ -30,3 +27,7 @@ services:
             methods:
               - POST
               - GET
+      actions:
+        pre-deploy:
+          - run: pip install -t src/ --no-deps -r requirements.txt
+            path: ./
