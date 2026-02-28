@@ -8,9 +8,11 @@ from urllib import request, parse
 from urllib.request import urlopen, Request
 from urllib.error import URLError
 
-DASHSCOPE_API_KEY = os.environ.get('DASHSCOPE_API_KEY', '')
+from src.cache import cache_resume_text, get_cached_resume_text, cache_resume_info, get_cached_resume_info, cache_match_result, get_cached_match_result
+from src.extractor_simple import extract_info_with_ai
+from src.matcher_simple import match_with_ai
 
-resume_storage = {}
+DASHSCOPE_API_KEY = os.environ.get('DASHSCOPE_API_KEY', '')
 
 
 def call_qwen(prompt: str) -> str:
@@ -36,20 +38,8 @@ def call_qwen(prompt: str) -> str:
         return ''
 
 
-def extract_info_with_ai(text: str) -> dict:
-    prompt = f"""你是一个简历信息提取助手。从以下简历中提取信息。
-返回JSON格式：{{"name":"姓名","phone":"电话","email":"邮箱","address":"地址","job_intent":"求职意向","work_years":"工作年限","education":"学历","skills":["技能1"],"experience":"经历"}}
-简历：{text[:2000]}"""
-    
-    try:
-        content = call_qwen(prompt)
-        match = re.search(r'\{[\s\S]*\}', content)
-        if match:
-            return json.loads(match.group())
-    except Exception as e:
-        print(f"提取错误: {e}")
-    
-    return {"name": "", "phone": "", "email": "", "address": "", "job_intent": "", "work_years": "", "education": "", "skills": [], "experience": ""}
+def extract_info_with_ai_wrapper(text: str) -> dict:
+    return extract_info_with_ai(text)
 
 
 def extract_job_keywords(job_description: str) -> list:
@@ -72,29 +62,8 @@ def calculate_skill_match(skills: list, job_keywords: list) -> dict:
     return {"matched": matched, "missing": missing, "skill_rate": skill_rate}
 
 
-def match_with_ai(resume_info: dict, job_description: str) -> dict:
-    skills = resume_info.get("skills", [])
-    experience = resume_info.get("experience", "")
-    
-    job_keywords = extract_job_keywords(job_description)
-    match_result = calculate_skill_match(skills, job_keywords)
-    
-    prompt = f"""分析匹配度。技能:{skills},经历:{experience[:200]},岗位:{job_description[:200]},已匹配:{match_result['matched']},缺失:{match_result['missing']}
-返回JSON：{{"match_score":0-100,"skill_match_rate":0.0,"experience_relevance":0.0,"matched_skills":[],"missing_skills":[],"analysis":"分析"}}"""
-    
-    try:
-        content = call_qwen(prompt)
-        match = re.search(r'\{[\s\S]*\}', content)
-        if match:
-            result = json.loads(match.group())
-            result['matched_skills'] = match_result['matched']
-            result['missing_skills'] = match_result['missing']
-            result['skill_match_rate'] = match_result['skill_rate']
-            return result
-    except Exception as e:
-        print(f"匹配错误: {e}")
-    
-    return {"match_score": 0, "skill_match_rate": 0.0, "experience_relevance": 0.0, "matched_skills": [], "missing_skills": [], "analysis": "匹配失败"}
+def match_with_ai_wrapper(resume_info: dict, job_description: str) -> dict:
+    return match_with_ai(resume_info, job_description)
 
 
 def handler(environ, start_response):
@@ -123,7 +92,7 @@ def handler(environ, start_response):
                         extracted_text = "PDF解析功能不可用，请配置本地环境或Layer"
                         
                         resume_id = str(uuid.uuid4())
-                        resume_storage[resume_id] = {"text": extracted_text, "file_content": base64.b64encode(file_content).decode()}
+                        cache_resume_text(resume_id, extracted_text) # 使用缓存
                         
                         response = json.dumps({
                             "success": True,
@@ -148,17 +117,28 @@ def handler(environ, start_response):
             data = json.loads(request_body.decode('utf-8'))
             resume_id = data.get('resume_id')
             
-            if not resume_id or resume_id not in resume_storage:
-                response = json.dumps({"success": False, "error": "简历不存在"})
+            if not resume_id:
+                response = json.dumps({"success": False, "error": "缺少resume_id"})
+                start_response('400 OK', [('Content-Type', 'application/json')])
+                return [response.encode('utf-8')]
+            
+            cached_info = get_cached_resume_info(resume_id)
+            if cached_info:
+                response = json.dumps({"success": True, "data": cached_info, "cached": True})
+                start_response('200 OK', [('Content-Type', 'application/json')])
+                return [response.encode('utf-8')]
+
+            cached_text = get_cached_resume_text(resume_id)
+            if not cached_text:
+                response = json.dumps({"success": False, "error": "简历不存在或已过期"})
                 start_response('404 OK', [('Content-Type', 'application/json')])
                 return [response.encode('utf-8')]
             
-            resume_data = resume_storage[resume_id]
-            info = extract_info_with_ai(resume_data.get('text', ''))
+            info = extract_info_with_ai_wrapper(cached_text)
             info["resume_id"] = resume_id
-            resume_storage[resume_id]["info"] = info
+            cache_resume_info(resume_id, info) # 使用缓存
             
-            response = json.dumps({"success": True, "data": info})
+            response = json.dumps({"success": True, "data": info, "cached": False})
             start_response('200 OK', [('Content-Type', 'application/json')])
             return [response.encode('utf-8')]
         except Exception as e:
@@ -174,20 +154,28 @@ def handler(environ, start_response):
             resume_id = data.get('resume_id')
             job_description = data.get('job_description', '')
             
-            if not resume_id or resume_id not in resume_storage:
-                response = json.dumps({"success": False, "error": "简历不存在"})
+            if not resume_id or not job_description:
+                response = json.dumps({"success": False, "error": "缺少必要参数"})
+                start_response('400 OK', [('Content-Type', 'application/json')])
+                return [response.encode('utf-8')]
+            
+            cached_result = get_cached_match_result(resume_id, job_description)
+            if cached_result:
+                response = json.dumps({"success": True, "data": cached_result, "cached": True})
+                start_response('200 OK', [('Content-Type', 'application/json')])
+                return [response.encode('utf-8')]
+
+            cached_info = get_cached_resume_info(resume_id)
+            if not cached_info:
+                response = json.dumps({"success": False, "error": "简历信息未提取或已过期"})
                 start_response('404 OK', [('Content-Type', 'application/json')])
                 return [response.encode('utf-8')]
             
-            resume_data = resume_storage[resume_id]
-            info = resume_data.get('info', {})
-            if not info:
-                info = extract_info_with_ai(resume_data.get('text', ''))
-            
-            result = match_with_ai(info, job_description)
+            result = match_with_ai_wrapper(cached_info, job_description)
             result["resume_id"] = resume_id
+            cache_match_result(resume_id, job_description, result) # 使用缓存
             
-            response = json.dumps({"success": True, "data": result})
+            response = json.dumps({"success": True, "data": result, "cached": False})
             start_response('200 OK', [('Content-Type', 'application/json')])
             return [response.encode('utf-8')]
         except Exception as e:
