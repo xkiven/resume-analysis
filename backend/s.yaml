@@ -13,7 +13,7 @@ services:
       function:
         name: resume-api
         runtime: python3.10
-        memorySize: 512
+        memorySize: 1024
         timeout: 120
         handler: src.main.handler
         codeUri: ./

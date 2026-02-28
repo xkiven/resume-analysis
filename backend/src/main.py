@@ -26,8 +26,8 @@ REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
 REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', '')
 
 from src.parser import extract_text_from_pdf, clean_text, split_sections
-from src.extractor import extract_info_with_ai, extract_info_fallback
-from src.matcher import match_with_ai, extract_job_keywords, calculate_skill_match
+from src.extractor_simple import extract_info_with_ai
+from src.matcher_simple import match_with_ai, extract_job_keywords, calculate_skill_match
 from src.cache import (
     cache_resume_text, get_cached_resume_text,
     cache_resume_info, get_cached_resume_info,
@@ -125,8 +125,8 @@ def resume_extract():
         
         try:
             info = extract_info_with_ai(cached_text)
-        except Exception:
-            info = extract_info_fallback(cached_text)
+        except Exception as e:
+            info = {"name": "", "phone": "", "email": "", "address": "", "skills": [], "experience": "", "error": str(e)}
         
         info["resume_id"] = resume_id
         
