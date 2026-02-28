@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://curvy-rooms-worry.loca.lt/api';
+const API_BASE_URL = 'https://resume-api-resume-service-lxvnobexrq.cn-shanghai.fcapp.run/api';
 
 let resumeId = null;
 let selectedFile = null;
