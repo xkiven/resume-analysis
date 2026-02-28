@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://tender-aliens-grin.loca.lt/api';
+const API_BASE_URL = 'http://localhost:3000/api';
 
 let resumeId = null;
 let selectedFile = null;
