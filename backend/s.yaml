@@ -17,6 +17,11 @@ services:
         timeout: 60
         handler: src.main.handler
         codeUri: ./
+        environmentVariables:
+          - key: DASHSCOPE_API_KEY
+            value: sk-c3c62b663de04038b76d2f444efbc979
+          - key: PYTHONPATH
+            value: /code
       triggers:
         - name: httpTrigger
           type: http
