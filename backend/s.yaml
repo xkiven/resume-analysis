@@ -1,0 +1,41 @@
+service: resume-analysis-service
+
+provider:
+  name: aliyun
+  runtime: python3.10
+  memorySize: 512
+  timeout: 60
+  region: cn-shanghai
+
+functions:
+  resumeUpload:
+    handler: src.main.resume_upload
+    description: Resume upload API
+    events:
+      - http:
+          path: /api/resume/upload
+          method: POST
+
+  resumeExtract:
+    handler: src.main.resume_extract
+    description: Resume extract API
+    events:
+      - http:
+          path: /api/resume/extract
+          method: POST
+
+  resumeMatch:
+    handler: src.main.resume_match
+    description: Resume match API
+    events:
+      - http:
+          path: /api/resume/match
+          method: POST
+
+  healthCheck:
+    handler: src.main.health_check
+    description: Health check API
+    events:
+      - http:
+          path: /api/health
+          method: GET
